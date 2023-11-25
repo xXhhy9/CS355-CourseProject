@@ -59,6 +59,11 @@ def compute_hash(file_path):
     return base64.b64encode(hasher.digest()).decode()
 
 def main():
+    #make sure all file names are included.
+    if (len(sys.argv) < 6):
+            print("Please input the correct number of filenames to send to Bob.")
+            return
+
     HOST = 'localhost'
     PORT = 8080
 
@@ -67,10 +72,6 @@ def main():
     public_key = private_key.public_key()
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        #make sure all file names are included.
-        if (len(sys.argv) < 6):
-            print("Please input the correct number of filenames to send to Bob.")
-
         print(f"Connecting to {HOST}:{PORT}.")
         try:
             s.connect((HOST, PORT))
@@ -93,17 +94,23 @@ def main():
         # Stage 2: File Hashing & Mac Generation. Alice and Bob calculate the hash of their file separately.
         alice_hashes = []
         alice_macs = []
-        out_str = ""
+        output_str = ""
         for i in range (1,5):
-            alice_hashes[i-1] = compute_hash(sys.argv[i])
+            try:
+                alice_hashes[i-1] = compute_hash(sys.argv[i])
+            except FileNotFoundError:
+                print(f"No file with the name {sys.argv[i]} found.")
+                s.close()
+                return
+
             alice_macs[i-1] = generate_hmac(secret_key, alice_hashes[i])
-            out_str += f";{alice_hashes[i-1]},{alice_macs[i-1]}"
+            output_str += f";{alice_hashes[i-1]},{alice_macs[i-1]}"
         #alice_hash = compute_hash('segment.bin')
         #print(f"File hash: {alice_hash}")
 
-        # Stage 3: Sending the string to bob.
-        print(f"Sending hash and HMAC to Bob.")
-        s.sendall(out_str.encode())
+        # Stage 3: Exchanging hashes with Bob.
+        print(f"Sending hashes and HMAC's to Bob.")
+        s.sendall(output_str.encode())
 
         # Stage 4: Exchange MAC and hash
         data = s.recv(1024).decode()
