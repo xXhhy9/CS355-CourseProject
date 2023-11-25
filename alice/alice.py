@@ -95,16 +95,17 @@ def main():
         alice_hashes = []
         alice_macs = []
         output_str = ""
-        for i in range (1,5):
+        for i in range (1,6):
             try:
-                alice_hashes[i-1] = compute_hash(sys.argv[i])
+                alice_hashes.append(compute_hash(sys.argv[i]))
             except FileNotFoundError:
                 print(f"No file with the name {sys.argv[i]} found.")
                 s.close()
                 return
 
-            alice_macs[i-1] = generate_hmac(secret_key, alice_hashes[i])
-            output_str += f";{alice_hashes[i-1]},{alice_macs[i-1]}"
+            alice_macs.append(generate_hmac(secret_key, alice_hashes[i - 1]))
+            output_str += f"{alice_hashes[i-1]},{alice_macs[i-1]};"
+        print(f"output string: {output_str}")
         #alice_hash = compute_hash('segment.bin')
         #print(f"File hash: {alice_hash}")
 
@@ -116,20 +117,21 @@ def main():
         data = s.recv(1024).decode()
         
         bob_outs = []
-        bob_outs[0:4] = data.split(';')
-        bob_hashes = []
-        bob_macs = []
-        for i in range (0,4):
+        bob_outs[0:6] = data.split(';')
+        print(f"splits: {bob_outs}")
+        bob_hashes = [0,0,0,0,0]
+        bob_macs = [0,0,0,0,0]
+        for i in range (0,5):
             bob_hashes[i], bob_macs[i] = bob_outs[i].split(',')
 
         # Verification and Hash Comparison
-        for i in range (0,4):
+        for i in range (0,5):
             if not verify_hmac(secret_key, bob_hashes[i], bob_macs[i]):
                 raise Exception(f"Failed to verify Bob mac #{i+1}.")
         print("Verification successful")
     
-        for i in range (0,4):
-            for j in range (0,4):
+        for i in range (0,5):
+            for j in range (0,5):
                 if (alice_hashes[i] == bob_hashes[j]):
                     print(f"Alice segment #{i+1} matches with Bob segment #{j+1}.")
                 else:
