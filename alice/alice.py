@@ -41,7 +41,6 @@ def generate_hmac(key, message):
     return base64.b64encode(hmac_digest).decode()
 
 def verify_hmac(key, message, hmac_to_verify):
-    print("Verifying HMAC.")
     # Generate the HMAC for the message
     generated_hmac = generate_hmac(key, message)
     # Compare the generated HMAC with the provided HMAC
@@ -105,7 +104,6 @@ def main():
 
             alice_macs.append(generate_hmac(secret_key, alice_hashes[i - 1]))
             output_str += f"{alice_hashes[i-1]},{alice_macs[i-1]};"
-        print(f"output string: {output_str}")
         #alice_hash = compute_hash('segment.bin')
         #print(f"File hash: {alice_hash}")
 
@@ -116,15 +114,16 @@ def main():
         # Stage 4: Exchange MAC and hash
         data = s.recv(1024).decode()
         
+        #formatting input
         bob_outs = []
         bob_outs[0:6] = data.split(';')
-        print(f"splits: {bob_outs}")
         bob_hashes = [0,0,0,0,0]
         bob_macs = [0,0,0,0,0]
         for i in range (0,5):
             bob_hashes[i], bob_macs[i] = bob_outs[i].split(',')
 
         # Verification and Hash Comparison
+        print("Verifying HMAC's")
         for i in range (0,5):
             if not verify_hmac(secret_key, bob_hashes[i], bob_macs[i]):
                 raise Exception(f"Failed to verify Bob mac #{i+1}.")
@@ -133,9 +132,7 @@ def main():
         for i in range (0,5):
             for j in range (0,5):
                 if (alice_hashes[i] == bob_hashes[j]):
-                    print(f"Alice segment #{i+1} matches with Bob segment #{j+1}.")
-                else:
-                    print(f"Alice segment #{i+1} does not match with Bob segment #{j+1}.")
+                    print(f"Alice segment '{sys.argv[i+1]}' matches with Bob segment #{j+1}.")
 
 if __name__ == "__main__":
     main()

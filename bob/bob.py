@@ -125,6 +125,7 @@ def main():
             #alice_hash, alice_mac = data.split(',')
 
             # Verification and Hash Comparison
+            print("Verifying HMAC's")
             for i in range (0,5):
                 if not verify_hmac(secret_key, bob_hashes[i], bob_macs[i]):
                     raise Exception(f"Failed to verify Bob mac #{i+1}.")
@@ -136,9 +137,7 @@ def main():
         for i in range (0,5):
             for j in range (0,5):
                 if (bob_hashes[i] == alice_hashes[j]):
-                    print(f"Bob segment #{i+1} matches with Alice segment #{j+1}.")
-                else:
-                    print(f"Bob segment #{i+1} does not match with ALice segment #{j+1}.")
+                    print(f"Bob segment '{sys.argv[i+1]}' matches with Alice segment #{j+1}.")
 
 if __name__ == "__main__":
     main()
