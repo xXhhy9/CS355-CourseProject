@@ -1,3 +1,4 @@
+import sys
 import socket
 import hashlib
 import base64
@@ -66,8 +67,16 @@ def main():
     public_key = private_key.public_key()
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        #make sure all file names are included.
+        if (len(sys.argv) < 6):
+            print("Please input the correct number of filenames to send to Bob.")
+
         print(f"Connecting to {HOST}:{PORT}.")
-        s.connect((HOST, PORT))
+        try:
+            s.connect((HOST, PORT))
+        except ConnectionRefusedError:
+            print("Failed to connect to Bob")
+            return
 
         # Stage 1: Key exchange. Alice and Bob use each other's public keys and their own private keys
         # to compute the shared key.
@@ -81,29 +90,43 @@ def main():
         # Secret_key will be used for HMAC
         secret_key = derive_key(shared_secret)
 
-        # Stage 2: File Hashing. Alice and Bob calculate the hash of their file separately.
-        alice_hash = compute_hash('segment.bin')
+        # Stage 2: File Hashing & Mac Generation. Alice and Bob calculate the hash of their file separately.
+        alice_hashes = []
+        alice_macs = []
+        out_str = ""
+        for i in range (1,5):
+            alice_hashes[i-1] = compute_hash(sys.argv[i])
+            alice_macs[i-1] = generate_hmac(secret_key, alice_hashes[i])
+            out_str += f";{alice_hashes[i-1]},{alice_macs[i-1]}"
+        #alice_hash = compute_hash('segment.bin')
         #print(f"File hash: {alice_hash}")
 
-        # Stage 3: Alice uses the secret key to generate a MAC for her hash.
-        alice_mac= generate_hmac(secret_key, alice_hash)
+        # Stage 3: Sending the string to bob.
         print(f"Sending hash and HMAC to Bob.")
-        s.sendall(f"{alice_hash},{alice_mac}".encode())
+        s.sendall(out_str.encode())
 
         # Stage 4: Exchange MAC and hash
         data = s.recv(1024).decode()
-        bob_hash, bob_mac = data.split(',')
+        
+        bob_outs = []
+        bob_outs[0:4] = data.split(';')
+        bob_hashes = []
+        bob_macs = []
+        for i in range (0,4):
+            bob_hashes[i], bob_macs[i] = bob_outs[i].split(',')
 
         # Verification and Hash Comparison
-        if verify_hmac(secret_key, bob_hash, bob_mac):
-            print("HMAC verified")
-        else:
-            print("HMAC verification failed")
-        
-        if (bob_hash == alice_hash):
-            print("Same Code Segment")
-        else:
-            print("Different Code Segment")
+        for i in range (0,4):
+            if not verify_hmac(secret_key, bob_hashes[i], bob_macs[i]):
+                raise Exception(f"Failed to verify Bob mac #{i+1}.")
+        print("Verification successful")
+    
+        for i in range (0,4):
+            for j in range (0,4):
+                if (alice_hashes[i] == bob_hashes[j]):
+                    print(f"Alice segment #{i+1} matches with Bob segment #{j+1}.")
+                else:
+                    print(f"Alice segment #{i+1} does not match with Bob segment #{j+1}.")
 
 if __name__ == "__main__":
     main()
