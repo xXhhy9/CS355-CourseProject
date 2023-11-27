@@ -138,6 +138,5 @@ def main():
             for j in range (0,5):
                 if (bob_hashes[i] == alice_hashes[j]):
                     print(f"Bob segment '{sys.argv[i+1]}' matches with Alice segment #{j+1}.")
-
 if __name__ == "__main__":
     main()

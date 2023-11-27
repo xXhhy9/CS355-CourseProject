@@ -1,0 +1,5 @@
+Listening on localhost:8080
+Connected by ('127.0.0.1', 53523)
+output string: WP7QOepWTCUrnK/7UOeKIzWixJ3UTtcc2Yj2IQAxHZ8=,XKwpe8CwjbUzNgdNT8uoHa7sNBjES4wI2/EtN0ckNUQ=;DIagz/TyHOnUkhcelSr3ebO1TmlJcAfE8W52urSWzbY=,UwhpfArozd3Tk22aromT7kqr5E8VIJK3vMV441DIYJ4=;Ofa84H1PAT5to4AcqLgeWZQuInLEg2+YeQVEnt7ZJ4I=,Ht9gRSWZa2T2kUi4OSUddvHwUGx6RFb+2e6l7FMH9fQ=;DgtF/PHBOt77cATZMrp9sJjIG4tkt6oxjTCEcYL9lOo=,Z2pX3q72RK7ew90EAmn0wBzxg6X0Gcxoge7tAR6bzno=;9QYfNogAoBZpurfpwA5KhTArAgntNaLylpWTFF7QjB0=,+a7azrIyjJy37jy4Q51iOTgNUirmZkFvZR7z2ZaY+Mw=;
+Sending hashes and HMAC's to Alice.
+splits: ['']
