@@ -106,7 +106,7 @@ def main():
                     return
                 bob_macs.append(generate_hmac(secret_key, bob_hashes[i-1]))
                 output_str += f"{bob_hashes[i-1]},{bob_macs[i-1]};"
-            print(f"output string: {output_str}")
+            #print(f"output string: {output_str}")
             #bob_hash = compute_hash('segment.bin')
             #bob_mac = generate_hmac(secret_key, bob_hash)
 
@@ -117,7 +117,7 @@ def main():
             data = conn.recv(1024).decode()
             alice_outs = []
             alice_outs[0:6] = data.split(';')
-            print(f"splits: {alice_outs}")
+            #print(f"splits: {alice_outs}")
             alice_hashes = [0,0,0,0,0]
             alice_macs = [0,0,0,0,0]
             for i in range (0,5):

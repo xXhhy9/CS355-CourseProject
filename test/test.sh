@@ -29,3 +29,6 @@ for ((i=num_runs + 1; i<=2*num_runs; i++)); do
     echo "-----------------------"
 done
 echo "Finished all runs."
+
+# clean up bins
+rm ../alice/*.bin ../bob/*.bin

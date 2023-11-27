@@ -48,7 +48,7 @@ def verify_hmac(key, message, hmac_to_verify):
 
 # Computes SHA-256 hash of a file
 def compute_hash(file_path):
-    print(f"Computing hash for {file_path}.")
+    #print(f"Computing hash for {file_path}.")
     hasher = hashlib.sha256()
     with open(file_path, 'rb') as file:
         buffer = file.read(8192)

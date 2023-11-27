@@ -1,0 +1,9 @@
+Connecting to localhost:8080.
+Sending hashes and HMAC's to Bob.
+Verifying HMAC's
+Verification successful
+Alice segment '../bob/segment1.bin' matches with Bob segment #1.
+Alice segment '../bob/segment10.bin' matches with Bob segment #2.
+Alice segment '../bob/segment2.bin' matches with Bob segment #3.
+Alice segment '../bob/segment3.bin' matches with Bob segment #4.
+Alice segment '../bob/segment4.bin' matches with Bob segment #5.

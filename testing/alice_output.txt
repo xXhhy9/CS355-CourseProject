@@ -1,2 +1,0 @@
-Connecting to localhost:8080.
-Failed to connect to Bob

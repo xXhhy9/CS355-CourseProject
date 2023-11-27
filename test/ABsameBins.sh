@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Directories to store files
-dir1="./alice"
-dir2="./bob"
+dir1="../alice"
+dir2="../bob"
 
 
 # Delete existing 'segment' files in both directories

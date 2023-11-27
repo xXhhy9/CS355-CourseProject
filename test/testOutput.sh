@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Directories for .bin files and Python scripts
-alice_bin_files_directory="./alice"
-bob_bin_files_directory="./bob"
-bob_script_directory="./bob"
-alice_script_directory="./alice"
+alice_bin_files_directory="../alice"
+bob_bin_files_directory="../bob"
+bob_script_directory="../bob"
+alice_script_directory="../alice"
 # Running bob.py in the background
 # echo "Running bob.py..."
 bob_bin_files=($(ls "${bob_bin_files_directory}" | grep 'segment.*\.bin' | head -n 5))
