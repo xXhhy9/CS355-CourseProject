@@ -1,4 +1,2 @@
 Connecting to localhost:8080.
-Computing hash for ./bob/segment1.bin.
-Computing hash for ./bob/segment10.bin.
-Computing hash for ./bob/segment2.bin.
+Failed to connect to Bob
