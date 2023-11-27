@@ -7,8 +7,6 @@ from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import hashes
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad, unpad
 
 # Function to generate a private key using Elliptic Curve Cryptography
 def generate_private_key():
