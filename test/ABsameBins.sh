@@ -10,7 +10,7 @@ rm -f "${dir1}/segment"*.bin
 rm -f "${dir2}/segment"*.bin
 
 # Number of files to generate
-num_files=10
+num_files=5
 
 
 # Generate at least 5 binary files and store in directories

@@ -1,10 +1,6 @@
-Listening on localhost:8080
-Connected by ('127.0.0.1', 64191)
-Sending hashes and HMAC's to Alice.
-Verifying HMAC's
-Verification successful
-Bob segment '../bob/segment1.bin' matches with Alice segment #1.
-Bob segment '../bob/segment10.bin' matches with Alice segment #2.
-Bob segment '../bob/segment2.bin' matches with Alice segment #3.
-Bob segment '../bob/segment3.bin' matches with Alice segment #4.
-Bob segment '../bob/segment4.bin' matches with Alice segment #5.
+error on socket creation
+segment1.bin: Files are different.
+segment2.bin: Files are different.
+segment3.bin: Files are different.
+segment4.bin: Files are different.
+segment5.bin: Files are different.

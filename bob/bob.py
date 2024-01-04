@@ -7,6 +7,9 @@ from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import hashes
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+
 
 # Function to generate a private key using Elliptic Curve Cryptography
 def generate_private_key():
@@ -51,6 +54,20 @@ def compute_hash(file_path):
             buffer = file.read(8192)
     return base64.b64encode(hasher.digest()).decode()
 
+# padding files for AES encryption
+def pad(s):
+    padding_length = AES.block_size - len(s) % AES.block_size
+    padding = chr(padding_length).encode()  # Convert padding character to bytes
+    return s + padding * padding_length
+#AES encryption of file
+def encrypt(file_name, key, iv):
+    with open(file_name, 'rb') as f:
+        plaintext = f.read()
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    ciphertext = cipher.encrypt(pad(plaintext))
+    with open(file_name, 'wb') as f:
+        f.write(ciphertext)
+
 def main():
     #checking for the required number of segments
     if (len(sys.argv) < 6):
@@ -79,6 +96,15 @@ def main():
         with conn:
             print(f"Connected by {addr}")
 
+            for i in range (1,6):
+                private_key = generate_private_key()
+                alice_public_key = serialization.load_pem_public_key(conn.recv(1024))
+                conn.sendall(serialize_public_key(private_key.public_key()))
+                rand_iv = get_random_bytes(16)
+                conn.sendall(rand_iv)
+                shared_secret = private_key.exchange(ec.ECDH(), alice_public_key)
+                secret_key = derive_key(shared_secret)
+                encrypt(sys.argv[i], secret_key, rand_iv)
             #Stage 1: Key exchange. Alice and Bob use each other's public keys and their own private keys
             # to compute the shared key.
             private_key = generate_private_key()
@@ -125,12 +151,12 @@ def main():
             # Verification and Hash Comparison
             print("Verifying HMAC's")
             for i in range (0,5):
-                if not verify_hmac(secret_key, bob_hashes[i], bob_macs[i]):
-                    raise Exception(f"Failed to verify Bob mac #{i+1}.")
+                if not verify_hmac(secret_key, alice_hashes[i], alice_macs[i]):
+                    raise Exception(f"Failed to verify Alice mac #{i+1}.")
             print("Verification successful")  
 
-            # print(f"Alice's Hash: {alice_hash}")
-            # print(f"Bob's Hash: {bob_hash}")
+            # print(f"Alice's Hash: {alice_hashes}")
+            # print(f"Bob's Hash: {bob_hashes}")
 
         for i in range (0,5):
             for j in range (0,5):

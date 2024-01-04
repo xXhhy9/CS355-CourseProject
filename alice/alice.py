@@ -7,6 +7,8 @@ from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import hashes
+from Crypto.Cipher import AES
+
 
 # Function to generate a private key using Elliptic Curve Cryptography
 # Reference: https://en.wikipedia.org/wiki/Elliptic-curve_Diffie–Hellman
@@ -55,6 +57,22 @@ def compute_hash(file_path):
             buffer = file.read(8192)
     return base64.b64encode(hasher.digest()).decode()
 
+# padding files for AES encryption
+def pad(s):
+    padding_length = AES.block_size - len(s) % AES.block_size
+    padding = chr(padding_length).encode()  # Convert padding character to bytes
+    return s + padding * padding_length
+
+#AES encryption of file
+def encrypt(file_name, key, iv):
+    with open(file_name, 'rb') as f:
+        plaintext = f.read()
+
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    ciphertext = cipher.encrypt(pad(plaintext))
+    with open(file_name, 'wb') as f:
+        f.write(ciphertext)
+
 def main():
     #make sure all file names are included.
     if (len(sys.argv) < 6):
@@ -64,9 +82,7 @@ def main():
     HOST = 'localhost'
     PORT = 8080
 
-    # Alice generates her public key and private key
-    private_key = generate_private_key()
-    public_key = private_key.public_key()
+
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         print(f"Connecting to {HOST}:{PORT}.")
@@ -76,16 +92,24 @@ def main():
             print("Failed to connect to Bob")
             return
 
-        # Stage 1: Key exchange. Alice and Bob use each other's public keys and their own private keys
+        # Stage 1: Key exchange for AES encryption using shared keys. Alice and Bob use each other's public keys and their own private keys
         # to compute the shared key.
+        for i in range (1,6):
+            private_key = generate_private_key()
+            public_key = private_key.public_key()
+            s.sendall(serialize_public_key(public_key))   
+            bob_public_key = serialization.load_pem_public_key(s.recv(1024))
+            shared_secret = private_key.exchange(ec.ECDH(), bob_public_key)
+            secret_key = derive_key(shared_secret)
+            rand_iv = s.recv(1024)   
+            encrypt(sys.argv[i], secret_key, rand_iv)
+
+
+        private_key = generate_private_key()
+        public_key = private_key.public_key()
         s.sendall(serialize_public_key(public_key))   
-        bob_public_key = serialization.load_pem_public_key(s.recv(1024))
-        
-        # Alice generates a value using her private key and Bob's public key, while Bob generates a value using his private key and Alice's public key.
-        # Due to the property of ECDH, these two values are shared secret
+        bob_public_key = serialization.load_pem_public_key(s.recv(1024))            
         shared_secret = private_key.exchange(ec.ECDH(), bob_public_key)
-        
-        # Secret_key will be used for HMAC
         secret_key = derive_key(shared_secret)
 
         # Stage 2: File Hashing & Mac Generation. Alice and Bob calculate the hash of their file separately.
